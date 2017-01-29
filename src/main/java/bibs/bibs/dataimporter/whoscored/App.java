@@ -4,8 +4,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,6 +31,8 @@ import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 /**
  * Clase Inicial de Prueba para la prueba de la lectura del Datos del WEB y
@@ -154,6 +158,10 @@ public class App {
 		// los equipos entre otros
 		Element weHeader = document.getElementById("match-header");
 
+		System.out.println("--------Header-------------");
+		System.out.println(weHeader.html());
+		System.out.println("--------FinHeader-------------");
+		
 		int i = 1;
 		Iterator<Element> ite = weHeader.getElementsByTag("tr").iterator();
 		while(ite.hasNext()) {
@@ -187,9 +195,34 @@ public class App {
 					j++;
 				}
 			}
+			
+			
 
 			i++;
 		}
+		
+		// Buscar el info-block que contenga "Kick off"
+		
+		it = document.getElementsByClass("info-block").iterator();
+		while(it.hasNext()) {
+			Element infoBlockE = it.next();
+			if(infoBlockE.text().contains("Kick off")) {
+				Elements horaFecha = infoBlockE.getElementsByTag("dd");
+				data.put("fechaOriginal", horaFecha.get(1).text());
+				
+				String f = horaFecha.get(1).text();
+				SimpleDateFormat df = new SimpleDateFormat("EEE, dd-MMM-yy", new Locale("en"));
+				SimpleDateFormat df2 = new SimpleDateFormat("yyyyMMdd");
+				Date d = df.parse(f);
+				
+				data.put("fecha", df2.format(d));
+				
+				data.put("hora", horaFecha.get(0).text());
+			}
+		}
+		
+		
+		
 		
 		
 		Element matchcentrestats = document.getElementById("match-centre-stats");
