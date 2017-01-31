@@ -154,6 +154,15 @@ public class App {
 		data.put("idMatch", idMatch);
 		
 		// --------------------------------->>>>
+		// Buscamos el country y la Temporada
+		Element div = document.getElementById("breadcrumb-nav");
+		data.put("country", div.getElementsByClass("iconize").text());
+		
+		String aLigaTemp = div.getElementsByTag("a").text();
+		data.put("Liga", aLigaTemp.split("-")[0].trim());
+		data.put("Temporada", aLigaTemp.split("-")[1].trim());
+		
+		// --------------------------------->>>>
 		// Procesamos el header, leemos desde el resultado final a los nombre de
 		// los equipos entre otros
 		Element weHeader = document.getElementById("match-header");
