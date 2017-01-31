@@ -83,7 +83,7 @@ public class App {
 		  
 			  i++;
 		  
-			  if(i == 3) break; // Por razones de Pruebas, con solo procesar tres juegos queremos salir 
+			  if(i == 2) break; // Por razones de Pruebas, con solo procesar tres juegos queremos salir 
 		  }
 		  
 		  
@@ -160,7 +160,9 @@ public class App {
 		
 		String aLigaTemp = div.getElementsByTag("a").text();
 		data.put("Liga", aLigaTemp.split("-")[0].trim());
-		data.put("Temporada", aLigaTemp.split("-")[1].trim());
+		
+		String temp = aLigaTemp.split("-")[1].trim().replace("\\", "");
+		data.put("Temporada", temp);
 		
 		// --------------------------------->>>>
 		// Procesamos el header, leemos desde el resultado final a los nombre de
