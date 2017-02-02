@@ -25,9 +25,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
-//import org.apache.synapse.task.Task;
+import org.apache.synapse.task.Task;
 
-public class TaskImporterWS implements /*Task,*/ ManagedLifecycle {
+public class TaskImporterWS implements Task, ManagedLifecycle {
 	private static final Log log = LogFactory.getLog(TaskImporterWS.class);
 
 	private static WebDriver driver;
@@ -94,7 +94,7 @@ public class TaskImporterWS implements /*Task,*/ ManagedLifecycle {
 
 		} catch (Exception e) {
 			if (log.isErrorEnabled()) {
-				log.error(e);
+				log.error(e,e);
 			}
 		}
 
@@ -259,5 +259,23 @@ public class TaskImporterWS implements /*Task,*/ ManagedLifecycle {
 	public void setSequenceName(String sequenceName) {
 		this.sequenceName = sequenceName;
 	}
+
+	public String getIncialMonth() {
+		return incialMonth;
+	}
+
+	public void setIncialMonth(String incialMonth) {
+		this.incialMonth = incialMonth;
+	}
+
+	public Integer getCantMonth() {
+		return cantMonth;
+	}
+
+	public void setCantMonth(int cantMonth) {
+		this.cantMonth = cantMonth;
+	}
+	
+	
 
 }

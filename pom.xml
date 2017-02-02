@@ -33,6 +33,11 @@
 			<version>2.48.2</version>
 		</dependency>
 		<dependency>
+		    <groupId>org.seleniumhq.selenium</groupId>
+		    <artifactId>selenium-remote-driver</artifactId>
+		    <version>2.48.2</version>
+		</dependency>
+		<dependency>
 			<groupId>com.opera</groupId>
 			<artifactId>operadriver</artifactId>
  		</dependency>
