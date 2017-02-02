@@ -39,24 +39,32 @@ import java.text.SimpleDateFormat;
  * posteriormente su transformacion a JSON
  *
  */
-public class App {
+public class AppReports {
 	private final static String pathFirefox = "C:\\Instalaciones\\Mozilla_27\\Mozilla Firefox\\firefox.exe";
 	private final String WHOSCORED = "https://www.whoscored.com";
 	private static List<String> urls_matches = new ArrayList<String>();
 	private static WebDriver driver;
-
-	/*
-	 * Instancia el Driver, Busca todos los urls especificos de cada juego a
-	 * procesar, y los llama uno a uno
-	 */
-	public static void main(String[] args) throws Exception {
-		System.out.println("main begins");
+	private String incialMonth;
+	private int cantMonth;
+	
+	public AppReports(String incialMonth, int cantMonth) {
+		FirefoxProfile profile = new FirefoxProfile(); 
+		driver = new FirefoxDriver(new FirefoxBinary(new File( pathFirefox)), profile);
+		System.out.println( "Driver Instanciado en constructor!" );
 		
-		App app = new App();
+		this.incialMonth = incialMonth;
+		this.cantMonth = cantMonth;
+		
+	}
+
+	public JSONArray getJsonArray() throws Exception {
 		JSONArray arreglo = new JSONArray();
 		JSONObject data;
 
-		app.getIdMatches();
+		
+		
+		
+		getIdMatches();
 		
 		//data = app.procesarMath("https://www.whoscored.com/Matches/1076193/MatchReport");
 		//System.out.println(data.toString());
@@ -72,22 +80,35 @@ public class App {
 		 */
 		// driver.close();
 
-		
+		int i = 0; 
 		  
-		  
-		  int i = 0; 
-		  
-		  for(String url : urls_matches) { 
-			  data = app.procesarMath(url);
+		for(String url : urls_matches) { 
+			  data = procesarMath(url);
 			  arreglo.put(data);
 		  
 			  i++;
 		  
 			  if(i == 2) break; // Por razones de Pruebas, con solo procesar tres juegos queremos salir 
-		  }
+		}
+		
+		
+		driver.close();
+		
+		return arreglo;
 		  
+	}
+	
+	/*
+	 * Instancia el Driver, Busca todos los urls especificos de cada juego a
+	 * procesar, y los llama uno a uno
+	 */
+	public static void main(String[] args) throws Exception {
+		System.out.println("main begins");
+		
+		AppReports app = new AppReports("Aug 2016", 1);
+		
 		  
-		  System.out.println(arreglo.toString());
+		  System.out.println(app.getJsonArray().toString());
 		  
 		  System.out.println("mains ends");
 		 
@@ -105,20 +126,57 @@ public class App {
 	public void getIdMatches() throws Exception {
 		String url = "https://www.whoscored.com/Regions/74/Tournaments/22/Seasons/6318/Stages/13768/Fixtures/France-Ligue-1-2016-2017";
 
-		//driver.get(url);
-		Document html = getHtml(url, false, false);
-
+		driver.get(url);
 		
-		//List<WebElement> wes = driver.findElements(By.className("match-report"));
-		Iterator<Element> it = html.getElementsByClass("match-report").iterator();
-
-		while(it.hasNext()) {
-			Element we = it.next();
-			System.out.println(we.attr("href"));
-
-			urls_matches.add(WHOSCORED + we.attr("href"));
+		// Buscamos el mes Inicial
+		WebElement div = driver.findElement(By.id("date-controller"));
+		WebElement buttonPrevius = driver.findElement(By.className("previous"));
+		WebElement buttonNext = driver.findElement(By.className("next"));
+		String actualMonth = div.findElement(By.id("date-config-toggle-button")).getText();
+		
+		int i = 0;
+		while(!actualMonth.equals(incialMonth)) {
+			buttonPrevius.click();
+			
+			Thread.sleep(2000);
+			
+			actualMonth = div.findElement(By.id("date-config-toggle-button")).getText().trim();
+			
+			i++;
+	
+			System.out.println("actualMonth = -" + actualMonth + "-   i = " + i + "   inicialMonth -" + incialMonth + "-");
+			
+			if(i >= 12) {
+				System.out.println("Ocurrio un evento inesperado");
+				return;
+			}
 		}
+		
+		for(i = 1; i <= cantMonth; i++) {
+			List<WebElement> wes = driver.findElements(By.className("match-report"));
+		
+			
+			Document html = Jsoup.parse(driver.getPageSource());
 
+			
+			//List<WebElement> wes = driver.findElements(By.className("match-report"));
+			Iterator<Element> it = html.getElementsByClass("match-report").iterator();
+
+			while(it.hasNext()) {
+				Element we = it.next();
+				System.out.println(we.attr("href"));
+
+				urls_matches.add(WHOSCORED + we.attr("href"));
+			}
+			
+			buttonNext.click();
+			
+			Thread.sleep(2000);
+		}
+		
+		/*
+		
+		*/
 	}
 
 	private JSONObject procesarMath(final String url) throws Exception {
@@ -161,7 +219,7 @@ public class App {
 		String aLigaTemp = div.getElementsByTag("a").text();
 		data.put("Liga", aLigaTemp.split("-")[0].trim());
 		
-		String temp = aLigaTemp.split("-")[1].trim().replace("\\", "");
+		String temp = aLigaTemp.split("-")[1].trim().replace("/", "");
 		data.put("Temporada", temp);
 		
 		// --------------------------------->>>>
@@ -399,14 +457,14 @@ public class App {
 			document = Jsoup.parse(response.toString());
 		} else {
 			
-			FirefoxProfile profile = new FirefoxProfile(); 
-			driver = new FirefoxDriver(new FirefoxBinary(new File( pathFirefox)), profile);
-			System.out.println( "Driver Instanciado!" );
+			//FirefoxProfile profile = new FirefoxProfile(); 
+			//driver = new FirefoxDriver(new FirefoxBinary(new File( pathFirefox)), profile);
+			//System.out.println( "Driver Instanciado!" );
 			
 			driver.get(url);
 			document = Jsoup.parse(driver.getPageSource());
 			
-			driver.close();
+			//driver.close();
 			
 		}
 		return document;
